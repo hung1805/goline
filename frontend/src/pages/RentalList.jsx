@@ -119,11 +119,15 @@ const RentalList = () => {
   }
 
   useEffect(() => {
-    if (isSearching) {
-      fetchSearchResults(page)
-    } else {
-      fetchRentals()
+    const fetchData = async () => {
+      if (isSearching) {
+        await fetchSearchResults(page)
+      } else {
+        await fetchRentals()
+      }
     }
+
+    fetchData()
   }, [page, sortKey, sortOrder])
 
   const handleClearSearch = () => {
