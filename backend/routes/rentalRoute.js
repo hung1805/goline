@@ -56,6 +56,33 @@ router.get("/", async (req, res) => {
   }
 })
 
+// Search
+router.get("/search", async (req, res) => {
+  try {
+    const { query, page = 1, limit = 10, sort, order } = req.query
+    const pageNumber = parseInt(page)
+    const limitNumber = parseInt(limit)
+
+    let filter = {
+      $or: [{ name: { $regex: query, $options: "i" } }, { address: { $regex: query, $options: "i" } }],
+    }
+
+    let dbQuery = Rental.find(filter)
+
+    if (sort) {
+      const sortOrder = order && order.toLowerCase() === "desc" ? -1 : 1
+      dbQuery = dbQuery.sort({ [sort]: sortOrder })
+    }
+
+    const total = await Rental.countDocuments(filter)
+    const rentals = await dbQuery.skip((pageNumber - 1) * limitNumber).limit(limitNumber)
+
+    res.json({ rentals, total, page: pageNumber, limit: limitNumber })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 // Get by ID
 router.get("/:id", async (req, res) => {
   try {
@@ -102,33 +129,6 @@ router.delete("/:id", async (req, res) => {
 
     await Rental.findByIdAndDelete(req.params.id)
     res.status(204).send()
-  } catch (error) {
-    res.status(500).json({ error: error.message })
-  }
-})
-
-// Search
-router.get("/search", async (req, res) => {
-  try {
-    const { query, page = 1, limit = 10, sort, order } = req.query
-    const pageNumber = parseInt(page)
-    const limitNumber = parseInt(limit)
-
-    let filter = {
-      $or: [{ name: { $regex: query, $options: "i" } }, { address: { $regex: query, $options: "i" } }],
-    }
-
-    let dbQuery = Rental.find(filter)
-
-    if (sort) {
-      const sortOrder = order && order.toLowerCase() === "desc" ? -1 : 1
-      dbQuery = dbQuery.sort({ [sort]: sortOrder })
-    }
-
-    const total = await Rental.countDocuments(filter)
-    const rentals = await dbQuery.skip((pageNumber - 1) * limitNumber).limit(limitNumber)
-
-    res.json({ rentals, total, page: pageNumber, limit: limitNumber })
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
