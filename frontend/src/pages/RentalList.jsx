@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Flex,
+  FormControl,
   Heading,
   HStack,
   IconButton,
@@ -37,8 +38,8 @@ import { API_URL } from "../../constant/api"
 import AddRentalDialog from "../components/AddRentalDialog"
 import DeleteConfirmDialog from "../components/DeleteConfirmDialog"
 import EditRentalDialog from "../components/EditRentalDialog"
-import { slugify } from "../utils/slug"
 import ExportRentals from "../components/ExportRental"
+import { slugify } from "../utils/slug"
 
 const RentalList = () => {
   const limit = 5
@@ -174,29 +175,30 @@ const RentalList = () => {
       </Flex>
 
       <Flex justify="space-between" align="center" mb={4}>
-        {/* Left: Search Bar */}
-        <HStack spacing={2} w="full" maxW="400px">
-          <Input
-            placeholder="Search by name or address..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            size="sm"
-            variant="filled"
-            borderRadius="md"
-          />
-          <Button type="submit" colorScheme="blue" size="sm" onClick={handleSearch}>
-            <FaSearch />
-          </Button>
-          {searchQuery && (
-            <IconButton
-              icon={<FaTimes />}
+        <FormControl as="form" onSubmit={handleSearch}>
+          <HStack spacing={2} w="full" maxW="400px">
+            <Input
+              placeholder="Enter name or address..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               size="sm"
-              colorScheme="red"
-              onClick={handleClearSearch}
-              aria-label="Clear search"
+              variant="filled"
+              borderRadius="md"
             />
-          )}
-        </HStack>
+            <Button type="submit" colorScheme="blue" size="sm">
+              <FaSearch />
+            </Button>
+            {searchQuery && (
+              <IconButton
+                icon={<FaTimes />}
+                size="sm"
+                colorScheme="red"
+                onClick={handleClearSearch}
+                aria-label="Clear search"
+              />
+            )}
+          </HStack>
+        </FormControl>
 
         <ExportRentals rentals={rentals} />
       </Flex>
